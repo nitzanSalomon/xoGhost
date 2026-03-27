@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe (Disappearing Pieces)</title>
+<style>
+    @font-face {
+  font-family: "chunk";
+  src: url("./assets/Chunk\ Five\ Print.ttf")
+    }
+
+    @font-face {
+  font-family: "narkis";
+  src: url("./assets/NarkissBlockCondensed-Thin-TRIAL.otf")
+    }
+
+  body {
+    font-family: chunk;
+    text-align: center;
+    background-image: url(./assets/background@300x.png);
+    color: #eee;
+    font-size: 3em;
+    overflow: hidden;
+  }
+
+  #start {
+    background-image: url(./assets/start.png);
+    width: 100vw;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 250px);
+    gap: 30px;
+    margin: 20px auto;
+    width: max-content;
+  }
+
+  .cell {
+    width: 250px;
+    height: 250px;
+    font-size: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 10px solid rgb(204 199 199 / 80%);
+    border-radius: 1rem;
+    box-shadow: inset 5px -6px 20px #ffffff96;
+  }
+
+  .cell:hover {
+    /* background-color: #eee; */
+  }
+
+  #header{
+    width: 100vw;
+    margin-top: 10vw;
+  }
+
+  #status {
+    font-family: narkis;
+    font-size: 5rem;
+    margin-top: 10px;
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div id="start" onclick='()=>{style.display="none"}'></div>
+<image id="header" src="./assets/header@300x.png">
+<p id="status">Current Player: X</p>
+
+<div id="board"></div>
+
+<script>
+const boardElement = document.getElementById("board");
+const statusText = document.getElementById("status");
+const startPage = document.getElementById('start');
+
+let board = Array(9).fill(null);
+
+// Track moves with timestamps
+let moveHistory = []; 
+let currentPlayer = "X";
+let moveCount = 0;
+
+// Each piece lasts 3 FULL turns = 6 moves
+const LIFETIME = 6;
+
+
+// Add an event listener for the 'click' event
+startPage.addEventListener('click', function() {
+  // Add the 'hidden' class to the box element
+  startPage.classList.add('hidden');
+});
+
+
+
+// Create board
+for (let i = 0; i < 9; i++) {
+  const cell = document.createElement("div");
+  cell.classList.add("cell");
+  cell.dataset.index = i;
+  cell.addEventListener("click", handleClick);
+  boardElement.appendChild(cell);
+}
+
+function handleClick(e) {
+  const index = e.target.dataset.index;
+
+  if (board[index]) return;
+
+  // Place piece
+  board[index] = currentPlayer;
+  moveHistory.push({
+    index: index,
+    player: currentPlayer,
+    moveNumber: moveCount
+  });
+
+  moveCount++;
+
+  // Remove expired pieces
+  removeOldPieces();
+
+  render();
+
+  if (checkWin()) {
+    statusText.textContent = `🎉 Player ${currentPlayer} Wins!`;
+    disableBoard();
+    return;
+  }
+
+  // Switch player
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  statusText.textContent = `Current Player: ${currentPlayer}`;
+}
+
+function removeOldPieces() {
+  moveHistory = moveHistory.filter(move => {
+    if (moveCount - move.moveNumber >= LIFETIME) {
+      board[move.index] = null;
+      return false;
+    }
+    return true;
+  });
+}
+
+function render() {
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach((cell, i) => {
+    cell.textContent = board[i] || "";
+  });
+}
+
+function checkWin() {
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  return wins.some(([a,b,c]) => {
+    return board[a] &&
+           board[a] === board[b] &&
+           board[a] === board[c];
+  });
+}
+
+function disableBoard() {
+  document.querySelectorAll(".cell").forEach(cell => {
+    cell.style.pointerEvents = "none";
+  });
+}
+</script>
+
+</body>
+</html>
