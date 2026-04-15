@@ -57,7 +57,21 @@
 
   #header{
     width: 100vw;
-    margin-top: 10vw;
+    margin-top: 12vw;
+  }
+
+  #infoButton {
+    width: 120px;
+    position: fixed;
+    top: 7vw;
+    right: 7vw;
+  }
+
+  #info {
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
   }
 
   #status {
@@ -74,6 +88,8 @@
 <body>
 <div id="start" onclick='()=>{style.display="none"}'></div>
 <image id="header" src="./assets/header@300x.png">
+<image id="infoButton" class="hidden" src="./assets/infoButton.png">
+<image id="info" class="hidden" src="./assets/info.png">
 <p id="status">Current Player: X</p>
 
 <div id="board"></div>
@@ -82,6 +98,8 @@
 const boardElement = document.getElementById("board");
 const statusText = document.getElementById("status");
 const startPage = document.getElementById('start');
+const infoButton = document.getElementById('infoButton');
+const info = document.getElementById('info');
 
 let board = Array(9).fill(null);
 
@@ -98,9 +116,17 @@ const LIFETIME = 6;
 startPage.addEventListener('click', function() {
   // Add the 'hidden' class to the box element
   startPage.classList.add('hidden');
+  infoButton.classList.remove('hidden');
+  infoButton.addEventListener('click',handelInfo);
 });
 
+function handelInfo () {
+  info.classList.remove('hidden');
+  info.addEventListener('click',() => {
+    info.classList.add('hidden');
+  });
 
+}
 
 // Create board
 for (let i = 0; i < 9; i++) {
